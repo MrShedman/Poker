@@ -65,6 +65,7 @@ void Deck::createDeck()
 		{
 			deck[n].evalValue = primes[r] | (r << 8) | suit | (1 << (16 + r));
 			deck[n].faceValue = rank_text[r] + " of " + suit_text[s];
+			deck[n].id = (CardIdentifier)(n);
 
 			sf::IntRect front(dx, dy, width, height);
 
@@ -189,24 +190,17 @@ void Deck::testPostFlop()
 
 }
 
-void Deck::testComparisons()
+void Deck::testBuildRandom(std::vector<Hand>& hands, std::array<Card, 5>& board, std::vector<Card>& dead_cards)
 {
-	// make a fresh new deck
-	createDeck();
-
 	const int num_players = 3;
+	hands.resize(num_players);
 
-	std::vector<Hand> player_hands;
-	player_hands.resize(num_players);
-
-	std::vector<Card> dead_cards;
-
-	for (auto& h : player_hands)
+	for (auto& h : hands)
 	{
 		h.cards[0] = dealCard();
 	}
 
-	for (auto& h : player_hands)
+	for (auto& h : hands)
 	{
 		h.cards[1] = dealCard();
 	}
@@ -219,6 +213,39 @@ void Deck::testComparisons()
 	{
 		board[i] = dealCard();
 	}
+	
+}
+
+void Deck::testBuildSpecific(std::vector<Hand>& hands, std::array<Card, 5>& board, std::vector<Card>& dead_cards)
+{
+	const int num_players = 3;
+	hands.resize(num_players);
+
+	hands[0].cards[0] = getCard(CardIdentifier::four_of_hearts);
+	hands[0].cards[1] = getCard(CardIdentifier::deuce_of_hearts);
+
+	hands[1].cards[0] = getCard(CardIdentifier::eight_of_hearts);
+	hands[1].cards[1] = getCard(CardIdentifier::nine_of_spades);
+
+	hands[2].cards[0] = getCard(CardIdentifier::ten_of_clubs);
+	hands[2].cards[1] = getCard(CardIdentifier::eight_of_clubs);
+
+	dead_cards.push_back(getCard(CardIdentifier::nine_of_clubs));
+
+	board[0] = getCard(CardIdentifier::jack_of_diamonds);
+	board[1] = getCard(CardIdentifier::king_of_hearts);
+	board[2] = getCard(CardIdentifier::jack_of_spades);
+}
+
+void Deck::testComparisons()
+{
+	// make a fresh new deck
+	createDeck();
+
+	std::vector<Hand> player_hands;
+	std::vector<Card> dead_cards;
+
+	testBuildSpecific(player_hands, board, dead_cards);
 
 	// evaluate hand positions
 	evaluateHandsMonteCarlo(player_hands, board);
@@ -234,7 +261,7 @@ void Deck::testComparisons()
 	std::cout << board[1] << ", ";
 	std::cout << board[2] << "\n";
 
-	for (int i = 0; i < num_players; ++i)
+	for (int i = 0; i < player_hands.size(); ++i)
 	{
 		std::cout << "Player: " << i << "\n";
 		std::cout << "C1: " << player_hands[i].cards[0];

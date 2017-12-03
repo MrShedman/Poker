@@ -52,6 +52,7 @@
     <ClInclude Include="Include\Application.h" />
     <ClInclude Include="Include\Button.hpp" />
     <ClInclude Include="Include\Card.h" />
+    <ClInclude Include="Include\CardIdentifier.h" />
     <ClInclude Include="Include\Category.hpp" />
     <ClInclude Include="Include\CircularContainer.h" />
     <ClInclude Include="Include\Command.hpp" />

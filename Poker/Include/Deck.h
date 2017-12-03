@@ -125,11 +125,23 @@ public:
 		return c;
 	}
 
+	Card getCard(const CardIdentifier& id)
+	{
+		return *std::find_if(std::begin(deck), std::end(deck),
+			[&id](const Card& c) { return c.id == id; });
+	}
+
 	Card getRandomCard()
 	{
 		int r = randomize(0, deck.size() - 1);
 
 		return deck[r];
+	}
+
+	bool containsCard(const CardIdentifier& id)
+	{
+		return std::find_if(std::begin(deck), std::end(deck),
+			[&id](const Card& c) { return c.id == id; }) != std::end(deck);
 	}
 
 	bool containsCard(const Card& card)
@@ -145,6 +157,8 @@ public:
 
 	void testPreFlop();
 	void testPostFlop();
+	void testBuildRandom(std::vector<Hand>& hands, std::array<Card, 5>& board, std::vector<Card>& dead_cards);
+	void testBuildSpecific(std::vector<Hand>& hands, std::array<Card, 5>& board, std::vector<Card>& dead_cards);
 	void testComparisons();
 
 	sf::Vector2f cardPosition(int player, int card);

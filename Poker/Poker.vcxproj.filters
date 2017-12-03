@@ -265,6 +265,9 @@
     <ClInclude Include="Include\Card.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Include\CardIdentifier.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Include\ResourceHolder.inl">

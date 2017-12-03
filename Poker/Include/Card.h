@@ -5,14 +5,15 @@
 #include <DealAnimation.h>
 #include <string>
 #include <iostream>
+#include "CardIdentifier.h"
 
 class Card
 {
 public:
 
-	int evalValue;
-	
+	int evalValue;	
 	std::string faceValue;
+	CardIdentifier id;
 
 	Deal dealAnimation;
 	Flip flipAnimation;
