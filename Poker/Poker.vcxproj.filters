@@ -125,6 +125,9 @@
     <ClCompile Include="Source\AI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Include\Card.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\AI.h">
@@ -134,9 +137,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Include\Application.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\Cards.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Include\Category.hpp">
@@ -261,6 +261,9 @@
     </ClInclude>
     <ClInclude Include="Include\StateStack.hpp">
       <Filter>Header Files\States</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Card.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

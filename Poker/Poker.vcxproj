@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Include\Card.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Source\AI.cpp" />
     <ClCompile Include="Source\Animation.cpp" />
@@ -50,7 +51,7 @@
     <ClInclude Include="Include\Animation.h" />
     <ClInclude Include="Include\Application.h" />
     <ClInclude Include="Include\Button.hpp" />
-    <ClInclude Include="Include\Cards.h" />
+    <ClInclude Include="Include\Card.h" />
     <ClInclude Include="Include\Category.hpp" />
     <ClInclude Include="Include\CircularContainer.h" />
     <ClInclude Include="Include\Command.hpp" />

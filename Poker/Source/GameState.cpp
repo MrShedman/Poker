@@ -118,7 +118,7 @@ mSceneGraph()
 	raise->setText("Raise");
 	raise->setCallback([this]()
 	{
-		dealCards();
+		dealCard();
 	});
 
 	mGUIContainer.pack({ fold, check, raise });
@@ -146,7 +146,7 @@ void GameState::flip()
 	}*/
 }
 
-void GameState::dealCards()
+void GameState::dealCard()
 {
 	//panels[2]->removePlayer();
 	deck->createDeck();

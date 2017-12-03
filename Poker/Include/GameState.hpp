@@ -30,7 +30,7 @@ class GameState : public State, public ViewableWorld
 
 		void fold();
 		void flip();
-		void dealCards();
+		void dealCard();
 		void completeRound();
 
 		inline const PlayerPanel& getPanel(int position) const

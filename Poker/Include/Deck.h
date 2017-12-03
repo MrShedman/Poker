@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include <SFML/Graphics.hpp>
-#include <Cards.h>
+#include <Card.h>
 #include <array>
 #include <Table.h>
 #include <Evaluator.h>
@@ -113,8 +113,10 @@ public:
 
 	template <typename T> void shuffle(T& Data);
 
-	void dealCard(std::vector<cards*> &hand);
-		
+	void dealCard(std::vector<Card*> &hand);
+	
+	void testComparisons();
+
 	sf::Vector2f cardPosition(int player, int card);
 
 	void flop();
@@ -125,7 +127,7 @@ public:
 
 	int rateHand(int h1, int h2);
 
-	std::vector<cards*> board;
+	std::vector<Card*> board;
 
 	int cardCount;
 	int cardnum;
@@ -145,7 +147,7 @@ private:
 
 	sf::RenderWindow &window;
 	
-	std::vector<cards> deck;
+	std::vector<Card> deck;
 
 	float scale;
 

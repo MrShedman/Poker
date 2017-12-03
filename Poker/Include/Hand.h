@@ -10,7 +10,7 @@ public:
 
 	~Hand();
 		
-	std::vector<cards*> pHand;
+	std::vector<Card*> pHand;
 
 	void dealAnim();
 

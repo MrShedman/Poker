@@ -86,7 +86,7 @@ void Deck::createDeck()
 	shuffle(deck);
 }
 
-void Deck::dealCard(std::vector<cards*> &hand)
+void Deck::dealCard(std::vector<Card*> &hand)
 {
 	int size = 0;
 
@@ -99,6 +99,11 @@ void Deck::dealCard(std::vector<cards*> &hand)
 
 	hand[size]->flipAnimation.setSprite(&hand[size]->sprite);
 	hand[size]->flipAnimation.setTime(0.4f, randomize(0.f, 0.6f));
+}
+
+void Deck::testComparisons()
+{
+
 }
 
 void Deck::flop()
