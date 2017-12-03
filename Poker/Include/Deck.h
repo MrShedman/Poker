@@ -8,6 +8,7 @@
 #include <Table.h>
 #include <Evaluator.h>
 #include <State.hpp>
+#include "Utility.h"
 
 #include <SceneNode.hpp>
 
@@ -100,9 +101,9 @@ public:
 	{
 		states.transform *= getTransform();
 
-		if (!board.empty())
+		if (!board_old.empty())
 		{
-			for (auto &b : board)
+			for (auto &b : board_old)
 			{
 				target.draw(b->sprite, states);
 			}
@@ -114,7 +115,28 @@ public:
 	template <typename T> void shuffle(T& Data);
 
 	void dealCard(std::vector<Card*> &hand);
+
+	Card dealCard()
+	{
+		Card c = deck.back();
+		deck.pop_back();
+		return c;
+	}
+
+	Card getRandomCard()
+	{
+		int r = randomize(0, deck.size() - 1);
+
+		return deck[r];
+	}
+
+	bool containsCard(const Card& card)
+	{
+		return std::find(std::begin(deck), std::end(deck), card) != std::end(deck);
+	}
 	
+	void testPreFlop();
+	void testPostFlop();
 	void testComparisons();
 
 	sf::Vector2f cardPosition(int player, int card);
@@ -127,7 +149,8 @@ public:
 
 	int rateHand(int h1, int h2);
 
-	std::vector<Card*> board;
+	std::vector<Card*> board_old;
+	std::array<Card, 5> board;
 
 	int cardCount;
 	int cardnum;

@@ -12,6 +12,8 @@ public:
 		
 	std::vector<Card*> pHand;
 
+	std::array<Card, 2> cards;
+
 	void dealAnim();
 
 	void flipAnim();

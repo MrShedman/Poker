@@ -2,7 +2,7 @@
 
 std::ostream& operator<< (std::ostream& os, const Card& card) 
 { 
-	os << card.evalValue << " " << card.faceValue << "\n"; 
+	os << card.evalValue << " " << card.faceValue; 
 	return os; 
 }
 

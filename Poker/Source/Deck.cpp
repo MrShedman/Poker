@@ -2,6 +2,7 @@
 #include <Utility.h>
 #include <ResourceHolder.hpp>
 #include <random>
+#include "Hand.h"
 
 void Deck::animate()
 {
@@ -22,6 +23,8 @@ texture(context.textures->get(Textures::CardAtlas))
 	numberOfPlayers = 0;
 
 	applyMove(CheckCall);
+
+	testComparisons();
 }
 
 template <typename T>
@@ -50,7 +53,7 @@ void Deck::createDeck()
 	std::array<std::string, 13> rank_text = {{ "Deuce", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", "Jack", "Queen", "King", "Ace" }};
 
 	playerDealOrder.clear();
-	board.clear();
+	board_old.clear();
 	deck.clear();
 	deck.resize(52);
 
@@ -101,16 +104,106 @@ void Deck::dealCard(std::vector<Card*> &hand)
 	hand[size]->flipAnimation.setTime(0.4f, randomize(0.f, 0.6f));
 }
 
-void Deck::testComparisons()
+void Deck::testPreFlop()
 {
 
+}
+
+void Deck::testPostFlop()
+{
+
+}
+
+void Deck::testComparisons()
+{
+	// make a fresh new deck
+	createDeck();
+
+	const int num_players = 3;
+
+	std::vector<Hand> player_hands;
+
+	player_hands.resize(num_players);
+
+	for (auto& h : player_hands)
+	{
+		h.cards[0] = dealCard();
+	}
+
+	for (auto& h : player_hands)
+	{
+		h.cards[1] = dealCard();
+	}
+
+	// burn a card before flop
+	deck.pop_back();
+
+	// 3 card flop
+	for (int i = 0; i < 3; ++i)
+	{
+		board[i] = dealCard();
+	}
+
+	// evaluate hand positions
+
+	const int num_evals = 10000;
+
+	std::vector<int> wins(num_players);
+	std::vector<int> draws(num_players);
+
+	for (int i = 0; i < num_evals; ++i)
+	{
+		std::array<Card, 5> temp_board = board;
+		temp_board[3] = getRandomCard();
+		temp_board[4] = getRandomCard();
+
+		int best_rank = 9999;
+		int best_j = 0;
+
+		for (int j = 0; j < num_players; ++j)
+		{
+			std::array<int, 7> full_board;
+			full_board[0] = temp_board[0].evalValue;
+			full_board[1] = temp_board[1].evalValue;
+			full_board[2] = temp_board[2].evalValue;
+			full_board[3] = temp_board[3].evalValue;
+			full_board[4] = temp_board[4].evalValue;
+			full_board[5] = player_hands[j].cards[0].evalValue;
+			full_board[6] = player_hands[j].cards[1].evalValue;
+
+			int rank = Eval::eval_7hand(full_board);
+
+			if (rank < best_rank)
+			{
+				best_rank = rank;
+				best_j = j;
+			}
+		}
+
+		wins[best_j]++;
+	}
+
+	std::cout << "Flop:\n";
+	std::cout << board[0] << ", ";
+	std::cout << board[1] << ", ";
+	std::cout << board[2] << "\n";
+
+	for (int i = 0; i < num_players; ++i)
+	{
+		float percent = wins[i] * 100.0f / (float)num_evals;
+
+		std::cout << "Player: " << i << "\n";
+		std::cout << "C1: " << player_hands[i].cards[0];
+		std::cout << "C2: " << player_hands[i].cards[1];
+		std::cout << "Win%: " << percent << "\n";
+	}
 }
 
 void Deck::flop()
 {	
 	for (i = 0; i < 5; ++i)
 	{
-		dealCard(board);	
+		dealCard(board_old);	
 	}
 
 	getBoardPosition();
@@ -121,29 +214,29 @@ void Deck::getBoardPosition()
 	position.clear();
 	position.resize(5);
 
-	for (i = 0; i < board.size(); ++i)
+	for (i = 0; i < board_old.size(); ++i)
 	{
 		position[i] = cardPosition(9, i);
-		board[i]->dealAnimation.setDestination(position[i]);		
+		board_old[i]->dealAnimation.setDestination(position[i]);		
 	}
 }
 
 void Deck::onResize()
 {	
-	if (!board.empty())
+	if (!board_old.empty())
 	{
-		for (i = 0; i < board.size(); ++i)
+		for (i = 0; i < board_old.size(); ++i)
 		{
 			position[i] = cardPosition(9, i);
 	
-			if (board[i]->dealAnimation.isRunning())
+			if (board_old[i]->dealAnimation.isRunning())
 			{
-				board[i]->dealAnimation.setInitialPosition(sf::Vector2f(static_cast<float>(window.getSize().x / 2), static_cast<float>(window.getSize().y / 2 - 255)));
-				board[i]->dealAnimation.setDestination(position[i]);
+				board_old[i]->dealAnimation.setInitialPosition(sf::Vector2f(static_cast<float>(window.getSize().x / 2), static_cast<float>(window.getSize().y / 2 - 255)));
+				board_old[i]->dealAnimation.setDestination(position[i]);
 			}
 			else
 			{				
-				board[i]->sprite.setPosition(position[i]);
+				board_old[i]->sprite.setPosition(position[i]);
 			}
 		}
 	}
@@ -266,7 +359,7 @@ int Deck::rateHand(int h1, int h2)
 
 	for (int i = 2; i < 7; ++i)
 	{
-		temp[i] = board[i - 2]->evalValue;	
+		temp[i] = board_old[i - 2]->evalValue;	
 	}
 
 	int rank = Eval::eval_7hand(temp);
