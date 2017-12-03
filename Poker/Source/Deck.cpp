@@ -118,6 +118,67 @@ int Deck::evaluateHand(const Hand& hand, const std::array<Card, 5>& board)
 	return Eval::eval_7hand(full_board);
 }
 
+void Deck::evaluateHandsMonteCarlo(std::vector<Hand>& hands, const std::array<Card, 5>& board)
+{
+	const int num_evals = 1000;
+	const int num_players = hands.size();
+
+	std::vector<int> wins(num_players);
+	std::vector<int> draws(num_players);
+
+	for (int i = 0; i < num_evals; ++i)
+	{
+		std::array<Card, 5> temp_board = board;
+		temp_board[3] = getRandomCard();
+		temp_board[4] = getRandomCard();
+
+		typedef std::pair<int, int> score_map;
+
+		std::vector<score_map> temp_scores(num_players);
+
+		for (int j = 0; j < num_players; ++j)
+		{
+			int rank = evaluateHand(hands[j], temp_board);
+
+			temp_scores[j] = std::make_pair(rank, j);
+		}
+
+		std::sort(std::begin(temp_scores), std::end(temp_scores), [](const score_map& lhs, const score_map& rhs)
+		{
+			return lhs.first < rhs.first;
+		});
+
+		// there a clear winner
+		if (temp_scores[0].first < temp_scores[1].first)
+		{
+			wins[temp_scores[0].second]++;
+		}
+		else // else must be a draw
+		{
+			draws[temp_scores[0].second]++;
+
+			for (int i = 1; i < num_players; ++i)
+			{
+				if (temp_scores[i].first == temp_scores[i - 1].first)
+				{
+					draws[temp_scores[i].second]++;
+				}
+			}
+		}
+	}
+
+	for (int j = 0; j < num_players; ++j)
+	{
+		hands[j].win_percent = (float)wins[j] * 100.0f / (float)num_evals;
+		hands[j].draw_percent = (float)draws[j] * 100.0f / (float)num_evals;
+	}
+}
+
+void Deck::evaluateHandsEnumerate(std::vector<Hand>& hands, const std::array<Card, 5>& board)
+{
+
+}
+
 void Deck::testPreFlop()
 {
 
@@ -136,8 +197,9 @@ void Deck::testComparisons()
 	const int num_players = 3;
 
 	std::vector<Hand> player_hands;
-
 	player_hands.resize(num_players);
+
+	std::vector<Card> dead_cards;
 
 	for (auto& h : player_hands)
 	{
@@ -150,7 +212,7 @@ void Deck::testComparisons()
 	}
 
 	// burn a card before flop
-	deck.pop_back();
+	dead_cards.push_back(dealCard());
 
 	// 3 card flop
 	for (int i = 0; i < 3; ++i)
@@ -159,61 +221,12 @@ void Deck::testComparisons()
 	}
 
 	// evaluate hand positions
-
-	const int num_evals = 1000;
-
-	std::vector<int> wins(num_players);
-	std::vector<int> draws(num_players);
-
-	for (int i = 0; i < num_evals; ++i)
+	evaluateHandsMonteCarlo(player_hands, board);
+	
+	std::cout << "Dead cards:\n";
+	for (auto& c : dead_cards)
 	{
-		std::array<Card, 5> temp_board = board;
-		temp_board[3] = getRandomCard();
-		temp_board[4] = getRandomCard();
-
-		int best_rank = 9999;
-		int best_j = 0;
-
-		typedef std::pair<int, int> score_map;
-
-		std::vector<score_map> temp_scores(num_players);
-
-		for (int j = 0; j < num_players; ++j)
-		{
-			int rank = evaluateHand(player_hands[j], temp_board);
-
-			temp_scores[j] = std::make_pair(rank, j);
-
-			if (rank < best_rank)
-			{
-				best_rank = rank;
-				best_j = j;
-			}
-		}
-
-		std::sort(std::begin(temp_scores), std::end(temp_scores), [](const score_map& lhs, const score_map& rhs)
-		{
-			return lhs.first < rhs.first;
-		});
-
-		if (temp_scores[0].first < temp_scores[1].first)
-		{
-			wins[temp_scores[0].second]++;
-		}
-		else
-		{
-			for (int i = 0; i < num_players; ++i)
-			{
-				draws[temp_scores[i].second]++;
-
-				if (temp_scores[i].first < temp_scores[i + 1].first)
-				{
-					break;
-				}
-			}
-		}
-
-		//wins[best_j]++;
+		std::cout << c << "\n";
 	}
 
 	std::cout << "Flop:\n";
@@ -223,14 +236,11 @@ void Deck::testComparisons()
 
 	for (int i = 0; i < num_players; ++i)
 	{
-		float win_percent = (wins[i] - draws[i]) * 100.0f / (float)num_evals;
-		float draw_percent = draws[i] * 100.0f / (float)num_evals;
-
 		std::cout << "Player: " << i << "\n";
 		std::cout << "C1: " << player_hands[i].cards[0];
 		std::cout << "C2: " << player_hands[i].cards[1];
-		std::cout << "Win%: " << win_percent << "\n";
-		std::cout << "Draw%: " << draw_percent << "\n";
+		std::cout << "Win%: " << player_hands[i].win_percent << "\n";
+		std::cout << "Draw%: " << player_hands[i].draw_percent << "\n";
 	}
 }
 

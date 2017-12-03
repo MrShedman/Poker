@@ -139,6 +139,10 @@ public:
 
 	int evaluateHand(const Hand& hand, const std::array<Card, 5>& board);
 	
+	void evaluateHandsMonteCarlo(std::vector<Hand>& hands, const std::array<Card, 5>& board);
+
+	void evaluateHandsEnumerate(std::vector<Hand>& hands, const std::array<Card, 5>& board);
+
 	void testPreFlop();
 	void testPostFlop();
 	void testComparisons();

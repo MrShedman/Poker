@@ -14,6 +14,9 @@ public:
 
 	std::array<Card, 2> cards;
 
+	float win_percent;
+	float draw_percent;
+
 	void dealAnim();
 
 	void flipAnim();
