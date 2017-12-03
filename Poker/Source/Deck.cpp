@@ -104,6 +104,20 @@ void Deck::dealCard(std::vector<Card*> &hand)
 	hand[size]->flipAnimation.setTime(0.4f, randomize(0.f, 0.6f));
 }
 
+int Deck::evaluateHand(const Hand& hand, const std::array<Card, 5>& board)
+{
+	std::array<int, 7> full_board;
+	full_board[0] = board[0].evalValue;
+	full_board[1] = board[1].evalValue;
+	full_board[2] = board[2].evalValue;
+	full_board[3] = board[3].evalValue;
+	full_board[4] = board[4].evalValue;
+	full_board[5] = hand.cards[0].evalValue;
+	full_board[6] = hand.cards[1].evalValue;
+
+	return Eval::eval_7hand(full_board);
+}
+
 void Deck::testPreFlop()
 {
 
@@ -146,7 +160,7 @@ void Deck::testComparisons()
 
 	// evaluate hand positions
 
-	const int num_evals = 10000;
+	const int num_evals = 1000;
 
 	std::vector<int> wins(num_players);
 	std::vector<int> draws(num_players);
@@ -160,18 +174,15 @@ void Deck::testComparisons()
 		int best_rank = 9999;
 		int best_j = 0;
 
+		typedef std::pair<int, int> score_map;
+
+		std::vector<score_map> temp_scores(num_players);
+
 		for (int j = 0; j < num_players; ++j)
 		{
-			std::array<int, 7> full_board;
-			full_board[0] = temp_board[0].evalValue;
-			full_board[1] = temp_board[1].evalValue;
-			full_board[2] = temp_board[2].evalValue;
-			full_board[3] = temp_board[3].evalValue;
-			full_board[4] = temp_board[4].evalValue;
-			full_board[5] = player_hands[j].cards[0].evalValue;
-			full_board[6] = player_hands[j].cards[1].evalValue;
+			int rank = evaluateHand(player_hands[j], temp_board);
 
-			int rank = Eval::eval_7hand(full_board);
+			temp_scores[j] = std::make_pair(rank, j);
 
 			if (rank < best_rank)
 			{
@@ -180,7 +191,29 @@ void Deck::testComparisons()
 			}
 		}
 
-		wins[best_j]++;
+		std::sort(std::begin(temp_scores), std::end(temp_scores), [](const score_map& lhs, const score_map& rhs)
+		{
+			return lhs.first < rhs.first;
+		});
+
+		if (temp_scores[0].first < temp_scores[1].first)
+		{
+			wins[temp_scores[0].second]++;
+		}
+		else
+		{
+			for (int i = 0; i < num_players; ++i)
+			{
+				draws[temp_scores[i].second]++;
+
+				if (temp_scores[i].first < temp_scores[i + 1].first)
+				{
+					break;
+				}
+			}
+		}
+
+		//wins[best_j]++;
 	}
 
 	std::cout << "Flop:\n";
@@ -190,12 +223,14 @@ void Deck::testComparisons()
 
 	for (int i = 0; i < num_players; ++i)
 	{
-		float percent = wins[i] * 100.0f / (float)num_evals;
+		float win_percent = (wins[i] - draws[i]) * 100.0f / (float)num_evals;
+		float draw_percent = draws[i] * 100.0f / (float)num_evals;
 
 		std::cout << "Player: " << i << "\n";
 		std::cout << "C1: " << player_hands[i].cards[0];
 		std::cout << "C2: " << player_hands[i].cards[1];
-		std::cout << "Win%: " << percent << "\n";
+		std::cout << "Win%: " << win_percent << "\n";
+		std::cout << "Draw%: " << draw_percent << "\n";
 	}
 }
 

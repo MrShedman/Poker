@@ -12,6 +12,8 @@
 
 #include <SceneNode.hpp>
 
+class Hand;
+
 class Deck : public SceneNode
 {
 public:
@@ -134,6 +136,8 @@ public:
 	{
 		return std::find(std::begin(deck), std::end(deck), card) != std::end(deck);
 	}
+
+	int evaluateHand(const Hand& hand, const std::array<Card, 5>& board);
 	
 	void testPreFlop();
 	void testPostFlop();
